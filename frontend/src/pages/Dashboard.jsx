@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
     Building2, AlertTriangle, TrendingDown, DollarSign,
-    Clock, MapPin, Activity, ArrowRight
+    Clock, MapPin, Activity, ArrowRight, RefreshCw
 } from 'lucide-react';
 import StatCard from '../components/StatCard';
 import ScoreGauge from '../components/ScoreGauge';
@@ -51,62 +51,65 @@ export default function Dashboard() {
     }));
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-                    <p className="text-dark-400 mt-1">Urban Infrastructure Health Overview</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-white">Dashboard</h1>
+                    <p className="text-dark-400 text-sm md:text-base mt-1">Urban Infrastructure Health Overview</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <span className="text-dark-400 text-sm">Last updated: Just now</span>
+                    <span className="text-dark-400 text-xs md:text-sm hidden sm:inline">Last updated: Just now</span>
                     <button
                         onClick={loadData}
-                        className="px-4 py-2 bg-primary-500/20 text-primary-400 rounded-lg hover:bg-primary-500/30 transition-colors"
+                        className="px-3 md:px-4 py-2 bg-primary-500/20 text-primary-400 rounded-lg hover:bg-primary-500/30 transition-colors flex items-center gap-2 text-sm"
                     >
-                        Refresh
+                        <RefreshCw className="w-4 h-4" />
+                        <span className="hidden sm:inline">Refresh</span>
                     </button>
                 </div>
             </div>
 
             {/* City Score Hero */}
-            <div className="glass-card rounded-2xl p-8 gradient-border">
-                <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                        <h2 className="text-xl font-semibold text-white mb-2">City MDI Score</h2>
-                        <p className="text-dark-400 mb-6 max-w-xl">
+            <div className="glass-card rounded-2xl p-4 md:p-8 gradient-border">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                    {/* Score Gauge - First on mobile */}
+                    <div className="order-first md:order-last">
+                        <ScoreGauge score={cityScore?.mdi_score || 85} size="lg" />
+                    </div>
+
+                    <div className="flex-1 text-center md:text-left">
+                        <h2 className="text-lg md:text-xl font-semibold text-white mb-2">City MDI Score</h2>
+                        <p className="text-dark-400 text-sm mb-6 max-w-xl">
                             The Maintenance Debt Index measures the overall health of urban infrastructure.
-                            A higher score indicates well-maintained assets with minimal accumulated debt.
+                            A higher score indicates well-maintained assets.
                         </p>
-                        <div className="grid grid-cols-3 gap-6">
+                        <div className="grid grid-cols-3 gap-3 md:gap-6">
                             <div>
-                                <p className="text-dark-500 text-sm mb-1">Total Debt</p>
-                                <p className="text-2xl font-bold text-red-400">
+                                <p className="text-dark-500 text-xs md:text-sm mb-1">Total Debt</p>
+                                <p className="text-lg md:text-2xl font-bold text-red-400">
                                     {formatCurrency(cityScore?.total_debt || 0)}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-dark-500 text-sm mb-1">Total Assets</p>
-                                <p className="text-2xl font-bold text-white">
+                                <p className="text-dark-500 text-xs md:text-sm mb-1">Total Assets</p>
+                                <p className="text-lg md:text-2xl font-bold text-white">
                                     {cityScore?.total_assets || 0}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-dark-500 text-sm mb-1">Open Issues</p>
-                                <p className="text-2xl font-bold text-yellow-400">
+                                <p className="text-dark-500 text-xs md:text-sm mb-1">Open Issues</p>
+                                <p className="text-lg md:text-2xl font-bold text-yellow-400">
                                     {cityScore?.total_open_issues || 0}
                                 </p>
                             </div>
                         </div>
                     </div>
-                    <div className="ml-8">
-                        <ScoreGauge score={cityScore?.mdi_score || 85} size="lg" />
-                    </div>
                 </div>
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                 <StatCard
                     title="Total Wards"
                     value={cityScore?.total_wards || 0}
@@ -119,7 +122,7 @@ export default function Dashboard() {
                     value={cityScore?.wards_critical || 0}
                     icon={AlertTriangle}
                     color="red"
-                    subtitle="Needing urgent attention"
+                    subtitle="Needing attention"
                 />
                 <StatCard
                     title="Debt Change (7d)"
@@ -138,40 +141,42 @@ export default function Dashboard() {
             </div>
 
             {/* Charts Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                 {/* Debt Growth */}
-                <div className="glass-card rounded-2xl p-6">
-                    <h3 className="text-lg font-semibold text-white mb-4">City Debt Trend</h3>
-                    <DebtGrowthChart data={mockDebtHistory} height={280} />
+                <div className="glass-card rounded-2xl p-4 md:p-6">
+                    <h3 className="text-base md:text-lg font-semibold text-white mb-4">City Debt Trend</h3>
+                    <div className="h-[200px] md:h-[280px]">
+                        <DebtGrowthChart data={mockDebtHistory} height={200} />
+                    </div>
                 </div>
 
                 {/* Ward Rankings */}
-                <div className="glass-card rounded-2xl p-6">
+                <div className="glass-card rounded-2xl p-4 md:p-6">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-white">Ward Rankings</h3>
+                        <h3 className="text-base md:text-lg font-semibold text-white">Ward Rankings</h3>
                         <Link to="/wards" className="text-primary-400 text-sm hover:underline flex items-center gap-1">
                             View all <ArrowRight className="w-4 h-4" />
                         </Link>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-2 md:space-y-3">
                         {wardScores.slice(0, 5).map((ward, idx) => (
-                            <div key={ward.ward_id} className="flex items-center gap-4 p-3 rounded-lg bg-dark-800/50">
-                                <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${idx === 0 ? 'bg-yellow-500/20 text-yellow-400' :
-                                        idx === 1 ? 'bg-gray-400/20 text-gray-300' :
-                                            idx === 2 ? 'bg-amber-600/20 text-amber-500' :
-                                                'bg-dark-700 text-dark-400'
+                            <div key={ward.ward_id} className="flex items-center gap-3 md:gap-4 p-2 md:p-3 rounded-lg bg-dark-800/50">
+                                <span className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-bold ${idx === 0 ? 'bg-yellow-500/20 text-yellow-400' :
+                                    idx === 1 ? 'bg-gray-400/20 text-gray-300' :
+                                        idx === 2 ? 'bg-amber-600/20 text-amber-500' :
+                                            'bg-dark-700 text-dark-400'
                                     }`}>
                                     {idx + 1}
                                 </span>
-                                <div className="flex-1">
-                                    <p className="text-white font-medium">{ward.ward_name}</p>
-                                    <p className="text-dark-500 text-sm">{ward.total_assets} assets</p>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-white font-medium text-sm md:text-base truncate">{ward.ward_name}</p>
+                                    <p className="text-dark-500 text-xs">{ward.total_assets} assets</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className={`font-bold ${getMDIColor(ward.mdi_score)}`}>
+                                    <p className={`font-bold text-sm md:text-base ${getMDIColor(ward.mdi_score)}`}>
                                         {ward.mdi_score.toFixed(1)}
                                     </p>
-                                    <p className="text-dark-500 text-xs">{ward.score_category}</p>
+                                    <p className="text-dark-500 text-xs hidden sm:block">{ward.score_category}</p>
                                 </div>
                             </div>
                         ))}
@@ -180,9 +185,9 @@ export default function Dashboard() {
             </div>
 
             {/* Category Breakdown */}
-            <div className="glass-card rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Ward Health Distribution</h3>
-                <div className="grid grid-cols-5 gap-4">
+            <div className="glass-card rounded-2xl p-4 md:p-6">
+                <h3 className="text-base md:text-lg font-semibold text-white mb-4">Ward Health Distribution</h3>
+                <div className="grid grid-cols-5 gap-2 md:gap-4">
                     {[
                         { label: 'Excellent', count: cityScore?.wards_excellent || 0, color: 'bg-mdi-excellent' },
                         { label: 'Good', count: cityScore?.wards_good || 0, color: 'bg-mdi-good' },
@@ -191,10 +196,10 @@ export default function Dashboard() {
                         { label: 'Critical', count: cityScore?.wards_critical || 0, color: 'bg-mdi-critical' },
                     ].map((item) => (
                         <div key={item.label} className="text-center">
-                            <div className={`w-16 h-16 mx-auto rounded-xl ${item.color} flex items-center justify-center mb-2`}>
-                                <span className="text-2xl font-bold text-white">{item.count}</span>
+                            <div className={`w-10 h-10 md:w-16 md:h-16 mx-auto rounded-lg md:rounded-xl ${item.color} flex items-center justify-center mb-1 md:mb-2`}>
+                                <span className="text-lg md:text-2xl font-bold text-white">{item.count}</span>
                             </div>
-                            <p className="text-dark-400 text-sm">{item.label}</p>
+                            <p className="text-dark-400 text-xs md:text-sm">{item.label}</p>
                         </div>
                     ))}
                 </div>

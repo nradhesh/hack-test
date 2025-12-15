@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, X, Save, Building2, MapPin } from 'lucide-react';
+import { Plus, X, Save, Building2, MapPin, AlertCircle } from 'lucide-react';
 import { createAsset, createWard, getWards, createIssue, getAssets } from '../services/api';
 
 export default function Admin() {
@@ -135,64 +135,68 @@ export default function Admin() {
     const issueCategories = ['pothole', 'crack', 'blockage', 'flooding', 'outage', 'damage', 'wear', 'other'];
     const severities = ['low', 'medium', 'high', 'critical'];
 
+    const inputClass = "w-full px-3 md:px-4 py-2.5 md:py-3 bg-dark-800 border border-dark-700 rounded-lg md:rounded-xl text-white focus:outline-none focus:border-primary-500 text-sm";
+    const labelClass = "block text-dark-400 text-xs md:text-sm mb-1.5 md:mb-2";
+
     return (
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold text-white">Admin Panel</h1>
-                <p className="text-dark-400 mt-1">Add new wards, assets, and issues</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-white">Admin Panel</h1>
+                <p className="text-dark-400 text-sm md:text-base mt-1">Add new wards, assets, and issues</p>
             </div>
 
             {/* Message */}
             {message && (
-                <div className={`p-4 rounded-xl ${message.type === 'error' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-green-500/20 text-green-400 border border-green-500/30'}`}>
+                <div className={`p-3 md:p-4 rounded-xl text-sm ${message.type === 'error' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-green-500/20 text-green-400 border border-green-500/30'}`}>
                     {message.text}
                 </div>
             )}
 
             {/* Tabs */}
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
                 {[
                     { id: 'asset', label: 'Add Asset', icon: Building2 },
                     { id: 'ward', label: 'Add Ward', icon: MapPin },
-                    { id: 'issue', label: 'Report Issue', icon: Plus },
+                    { id: 'issue', label: 'Report Issue', icon: AlertCircle },
                 ].map((tab) => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${activeTab === tab.id
+                        className={`flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-lg md:rounded-xl font-medium transition-all text-sm ${activeTab === tab.id
                                 ? 'bg-primary-500 text-white'
                                 : 'bg-dark-800 text-dark-400 hover:text-white hover:bg-dark-700'
                             }`}
                     >
-                        <tab.icon className="w-5 h-5" />
-                        {tab.label}
+                        <tab.icon className="w-4 h-4 md:w-5 md:h-5" />
+                        <span className="hidden sm:inline">{tab.label}</span>
+                        <span className="sm:hidden">{tab.label.split(' ')[1]}</span>
                     </button>
                 ))}
             </div>
 
             {/* Asset Form */}
             {activeTab === 'asset' && (
-                <form onSubmit={handleAssetSubmit} className="glass-card rounded-2xl p-6">
-                    <h2 className="text-xl font-semibold text-white mb-6">Create New Asset</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form onSubmit={handleAssetSubmit} className="glass-card rounded-xl md:rounded-2xl p-4 md:p-6">
+                    <h2 className="text-lg md:text-xl font-semibold text-white mb-4 md:mb-6">Create New Asset</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Asset Name *</label>
+                            <label className={labelClass}>Asset Name *</label>
                             <input
                                 type="text"
                                 required
                                 value={assetForm.name}
                                 onChange={(e) => setAssetForm({ ...assetForm, name: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                                 placeholder="e.g., Main Road Section A"
                             />
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Asset Type *</label>
+                            <label className={labelClass}>Asset Type *</label>
                             <select
                                 value={assetForm.asset_type}
                                 onChange={(e) => setAssetForm({ ...assetForm, asset_type: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                             >
                                 {assetTypes.map((type) => (
                                     <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')}</option>
@@ -200,11 +204,11 @@ export default function Admin() {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Ward</label>
+                            <label className={labelClass}>Ward</label>
                             <select
                                 value={assetForm.ward_id}
                                 onChange={(e) => setAssetForm({ ...assetForm, ward_id: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                             >
                                 <option value="">Select Ward</option>
                                 {wards.map((ward) => (
@@ -213,61 +217,61 @@ export default function Admin() {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Zone</label>
+                            <label className={labelClass}>Zone</label>
                             <input
                                 type="text"
                                 value={assetForm.zone}
                                 onChange={(e) => setAssetForm({ ...assetForm, zone: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                                 placeholder="e.g., North"
                             />
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Latitude</label>
+                            <label className={labelClass}>Latitude</label>
                             <input
                                 type="number"
                                 step="any"
                                 value={assetForm.latitude}
                                 onChange={(e) => setAssetForm({ ...assetForm, latitude: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                                 placeholder="e.g., 12.9716"
                             />
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Longitude</label>
+                            <label className={labelClass}>Longitude</label>
                             <input
                                 type="number"
                                 step="any"
                                 value={assetForm.longitude}
                                 onChange={(e) => setAssetForm({ ...assetForm, longitude: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                                 placeholder="e.g., 77.5946"
                             />
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Base Repair Cost (₹)</label>
+                            <label className={labelClass}>Base Repair Cost (₹)</label>
                             <input
                                 type="number"
                                 value={assetForm.base_repair_cost}
                                 onChange={(e) => setAssetForm({ ...assetForm, base_repair_cost: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                             />
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">SLA Days</label>
+                            <label className={labelClass}>SLA Days</label>
                             <input
                                 type="number"
                                 value={assetForm.sla_days}
                                 onChange={(e) => setAssetForm({ ...assetForm, sla_days: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                             />
                         </div>
                         <div className="md:col-span-2">
-                            <label className="block text-dark-400 text-sm mb-2">Description</label>
+                            <label className={labelClass}>Description</label>
                             <textarea
                                 value={assetForm.description}
                                 onChange={(e) => setAssetForm({ ...assetForm, description: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                                 rows={3}
                                 placeholder="Optional description..."
                             />
@@ -276,9 +280,9 @@ export default function Admin() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="mt-6 px-8 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-xl font-medium flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
+                        className="mt-4 md:mt-6 w-full sm:w-auto px-6 md:px-8 py-2.5 md:py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-lg md:rounded-xl font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 text-sm"
                     >
-                        <Save className="w-5 h-5" />
+                        <Save className="w-4 h-4 md:w-5 md:h-5" />
                         {loading ? 'Creating...' : 'Create Asset'}
                     </button>
                 </form>
@@ -286,80 +290,80 @@ export default function Admin() {
 
             {/* Ward Form */}
             {activeTab === 'ward' && (
-                <form onSubmit={handleWardSubmit} className="glass-card rounded-2xl p-6">
-                    <h2 className="text-xl font-semibold text-white mb-6">Create New Ward</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form onSubmit={handleWardSubmit} className="glass-card rounded-xl md:rounded-2xl p-4 md:p-6">
+                    <h2 className="text-lg md:text-xl font-semibold text-white mb-4 md:mb-6">Create New Ward</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Ward Code *</label>
+                            <label className={labelClass}>Ward Code *</label>
                             <input
                                 type="text"
                                 required
                                 value={wardForm.ward_code}
                                 onChange={(e) => setWardForm({ ...wardForm, ward_code: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                                 placeholder="e.g., W006"
                             />
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Ward Name *</label>
+                            <label className={labelClass}>Ward Name *</label>
                             <input
                                 type="text"
                                 required
                                 value={wardForm.name}
                                 onChange={(e) => setWardForm({ ...wardForm, name: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                                 placeholder="e.g., Tech Park Zone"
                             />
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Zone</label>
+                            <label className={labelClass}>Zone</label>
                             <input
                                 type="text"
                                 value={wardForm.zone}
                                 onChange={(e) => setWardForm({ ...wardForm, zone: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                                 placeholder="e.g., East"
                             />
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Ward Officer</label>
+                            <label className={labelClass}>Ward Officer</label>
                             <input
                                 type="text"
                                 value={wardForm.ward_officer}
                                 onChange={(e) => setWardForm({ ...wardForm, ward_officer: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                                 placeholder="e.g., John Doe"
                             />
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Center Latitude</label>
+                            <label className={labelClass}>Center Latitude</label>
                             <input
                                 type="number"
                                 step="any"
                                 value={wardForm.center_latitude}
                                 onChange={(e) => setWardForm({ ...wardForm, center_latitude: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                                 placeholder="e.g., 12.9716"
                             />
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Center Longitude</label>
+                            <label className={labelClass}>Center Longitude</label>
                             <input
                                 type="number"
                                 step="any"
                                 value={wardForm.center_longitude}
                                 onChange={(e) => setWardForm({ ...wardForm, center_longitude: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                                 placeholder="e.g., 77.5946"
                             />
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Population</label>
+                            <label className={labelClass}>Population</label>
                             <input
                                 type="number"
                                 value={wardForm.population}
                                 onChange={(e) => setWardForm({ ...wardForm, population: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                                 placeholder="e.g., 50000"
                             />
                         </div>
@@ -367,9 +371,9 @@ export default function Admin() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="mt-6 px-8 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-xl font-medium flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
+                        className="mt-4 md:mt-6 w-full sm:w-auto px-6 md:px-8 py-2.5 md:py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-lg md:rounded-xl font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 text-sm"
                     >
-                        <Save className="w-5 h-5" />
+                        <Save className="w-4 h-4 md:w-5 md:h-5" />
                         {loading ? 'Creating...' : 'Create Ward'}
                     </button>
                 </form>
@@ -377,16 +381,16 @@ export default function Admin() {
 
             {/* Issue Form */}
             {activeTab === 'issue' && (
-                <form onSubmit={handleIssueSubmit} className="glass-card rounded-2xl p-6">
-                    <h2 className="text-xl font-semibold text-white mb-6">Report New Issue</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form onSubmit={handleIssueSubmit} className="glass-card rounded-xl md:rounded-2xl p-4 md:p-6">
+                    <h2 className="text-lg md:text-xl font-semibold text-white mb-4 md:mb-6">Report New Issue</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Asset *</label>
+                            <label className={labelClass}>Asset *</label>
                             <select
                                 required
                                 value={issueForm.asset_id}
                                 onChange={(e) => setIssueForm({ ...issueForm, asset_id: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                             >
                                 <option value="">Select Asset</option>
                                 {assets.map((asset) => (
@@ -395,22 +399,22 @@ export default function Admin() {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Title *</label>
+                            <label className={labelClass}>Title *</label>
                             <input
                                 type="text"
                                 required
                                 value={issueForm.title}
                                 onChange={(e) => setIssueForm({ ...issueForm, title: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                                 placeholder="e.g., Large pothole on main road"
                             />
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Category *</label>
+                            <label className={labelClass}>Category *</label>
                             <select
                                 value={issueForm.category}
                                 onChange={(e) => setIssueForm({ ...issueForm, category: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                             >
                                 {issueCategories.map((cat) => (
                                     <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
@@ -418,11 +422,11 @@ export default function Admin() {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Severity *</label>
+                            <label className={labelClass}>Severity *</label>
                             <select
                                 value={issueForm.severity}
                                 onChange={(e) => setIssueForm({ ...issueForm, severity: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                             >
                                 {severities.map((sev) => (
                                     <option key={sev} value={sev}>{sev.charAt(0).toUpperCase() + sev.slice(1)}</option>
@@ -430,20 +434,20 @@ export default function Admin() {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-dark-400 text-sm mb-2">Estimated Repair Cost (₹)</label>
+                            <label className={labelClass}>Estimated Repair Cost (₹)</label>
                             <input
                                 type="number"
                                 value={issueForm.estimated_repair_cost}
                                 onChange={(e) => setIssueForm({ ...issueForm, estimated_repair_cost: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                             />
                         </div>
                         <div className="md:col-span-2">
-                            <label className="block text-dark-400 text-sm mb-2">Description</label>
+                            <label className={labelClass}>Description</label>
                             <textarea
                                 value={issueForm.description}
                                 onChange={(e) => setIssueForm({ ...issueForm, description: e.target.value })}
-                                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white focus:outline-none focus:border-primary-500"
+                                className={inputClass}
                                 rows={3}
                                 placeholder="Describe the issue..."
                             />
@@ -452,9 +456,9 @@ export default function Admin() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="mt-6 px-8 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-xl font-medium flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
+                        className="mt-4 md:mt-6 w-full sm:w-auto px-6 md:px-8 py-2.5 md:py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-lg md:rounded-xl font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 text-sm"
                     >
-                        <Save className="w-5 h-5" />
+                        <Save className="w-4 h-4 md:w-5 md:h-5" />
                         {loading ? 'Creating...' : 'Report Issue'}
                     </button>
                 </form>
