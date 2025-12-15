@@ -94,6 +94,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: mdi-frontend
+    environment:
+      VITE_API_URL: http://backend:8000
     ports:
       - "5173:5173"
     depends_on:

@@ -41,13 +41,16 @@ def seed_initial_data():
         
         logger.info("Seeding database with initial data...")
         
-        # Create wards
+        # Create wards - Bangalore locations
         wards_data = [
-            {"ward_code": "W001", "name": "Downtown Central", "zone": "Central", "center_latitude": 12.9716, "center_longitude": 77.5946},
-            {"ward_code": "W002", "name": "Riverside East", "zone": "East", "center_latitude": 12.9816, "center_longitude": 77.6046},
-            {"ward_code": "W003", "name": "Industrial North", "zone": "North", "center_latitude": 12.9916, "center_longitude": 77.5846},
-            {"ward_code": "W004", "name": "Residential South", "zone": "South", "center_latitude": 12.9616, "center_longitude": 77.5746},
-            {"ward_code": "W005", "name": "Commercial West", "zone": "West", "center_latitude": 12.9716, "center_longitude": 77.5646},
+            {"ward_code": "W001", "name": "Koramangala", "zone": "South", "center_latitude": 12.9352, "center_longitude": 77.6245},
+            {"ward_code": "W002", "name": "Indiranagar", "zone": "East", "center_latitude": 12.9784, "center_longitude": 77.6408},
+            {"ward_code": "W003", "name": "Whitefield", "zone": "East", "center_latitude": 12.9698, "center_longitude": 77.7500},
+            {"ward_code": "W004", "name": "Jayanagar", "zone": "South", "center_latitude": 12.9308, "center_longitude": 77.5838},
+            {"ward_code": "W005", "name": "Malleshwaram", "zone": "North", "center_latitude": 13.0035, "center_longitude": 77.5710},
+            {"ward_code": "W006", "name": "Electronic City", "zone": "South", "center_latitude": 12.8399, "center_longitude": 77.6770},
+            {"ward_code": "W007", "name": "HSR Layout", "zone": "South", "center_latitude": 12.9116, "center_longitude": 77.6389},
+            {"ward_code": "W008", "name": "Marathahalli", "zone": "East", "center_latitude": 12.9591, "center_longitude": 77.6974},
         ]
         
         wards = []

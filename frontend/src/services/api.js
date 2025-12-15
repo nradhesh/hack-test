@@ -1,11 +1,23 @@
 import axios from 'axios';
 
+// In Docker, frontend makes requests to backend via the Docker network
+// In dev mode, vite proxy handles /api requests
 const API_BASE_URL = '/api/v1';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
     headers: { 'Content-Type': 'application/json' },
+    timeout: 10000,
 });
+
+// Add response interceptor for error handling
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        console.error('API Error:', error.message);
+        return Promise.reject(error);
+    }
+);
 
 // Assets
 export const getAssets = (params) => api.get('/assets', { params });
