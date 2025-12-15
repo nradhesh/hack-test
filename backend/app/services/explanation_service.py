@@ -9,7 +9,6 @@ from datetime import date, timedelta
 from typing import Optional, List
 from sqlalchemy.orm import Session
 import logging
-
 from app.core.config import get_settings
 from app.models.asset import Asset
 from app.models.issue import Issue
@@ -28,11 +27,9 @@ from app.schemas.explanation import (
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
-
 class ExplanationService:
     """
     Service for generating human-readable explanations.
-    
     Converts debt calculations and scores into natural
     language that non-technical users can understand.
     """

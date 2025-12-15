@@ -10,7 +10,6 @@ from typing import List, Optional, Dict
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 import logging
-
 from app.core.debt_engine import MDIScoreCalculator
 from app.core.config import get_settings
 from app.models.asset import Asset
@@ -29,11 +28,9 @@ from app.services.debt_service import DebtService
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
-
 class AggregationService:
     """
     Service for aggregating MDI scores across organizational levels.
-    
     Provides methods for:
     - Calculating ward-level aggregated scores
     - Calculating city-wide scores

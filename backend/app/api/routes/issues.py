@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 import uuid
-
 from app.api.deps import get_db
 from app.models.asset import Asset
 from app.models.issue import Issue, IssueSeverity, IssueCategory
@@ -23,7 +22,6 @@ from app.services.debt_service import DebtService
 from app.core.config import get_sla_days
 
 router = APIRouter()
-
 
 @router.get("", response_model=IssueListResponse)
 def list_issues(
@@ -104,7 +102,6 @@ def list_issues(
         total_pages=total_pages,
     )
 
-
 @router.get("/summary", response_model=IssueSummary)
 def get_issue_summary(
     db: Session = Depends(get_db),
@@ -141,7 +138,6 @@ def get_issue_summary(
         avg_delay_days=avg_delay,
     )
 
-
 @router.get("/{issue_id}", response_model=IssueResponse)
 def get_issue(
     issue_id: int,
@@ -176,7 +172,6 @@ def get_issue(
         reported_by=issue.reported_by,
         created_at=issue.created_at,
     )
-
 
 @router.post("", response_model=IssueResponse, status_code=201)
 def create_issue(

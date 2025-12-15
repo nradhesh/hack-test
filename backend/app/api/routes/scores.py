@@ -6,7 +6,6 @@ from typing import List, Optional
 from datetime import date, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-
 from app.api.deps import get_db
 from app.schemas.score import (
     MDIScoreResponse,
@@ -22,7 +21,6 @@ from app.models.ward import Ward, WardScore, CityScore
 from app.models.debt import DebtSnapshot
 
 router = APIRouter()
-
 
 @router.get("/dashboard", response_model=ScoreDashboard)
 def get_score_dashboard(
@@ -257,7 +255,6 @@ def get_ward_score_history(
         trend=trend,
     )
 
-
 @router.get("/city", response_model=CityScoreResponse)
 def get_city_score(
     city_code: str = "default",
@@ -305,7 +302,6 @@ def get_all_ward_scores(
         score.total_wards = len(scores)
     
     return scores
-
 
 @router.post("/refresh")
 def refresh_all_scores(

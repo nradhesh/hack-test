@@ -6,7 +6,6 @@ from typing import Optional
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-
 from app.api.deps import get_db
 from app.schemas.debt import (
     DebtResponse,
@@ -21,7 +20,6 @@ from app.models.asset import Asset
 from app.models.ward import Ward
 
 router = APIRouter()
-
 
 @router.get("/asset/{asset_id}", response_model=DebtResponse)
 def get_asset_debt(
@@ -42,7 +40,6 @@ def get_asset_debt(
     
     return debt_response
 
-
 @router.get("/asset/{asset_id}/history", response_model=DebtHistoryResponse)
 def get_asset_debt_history(
     asset_id: int,
@@ -61,7 +58,6 @@ def get_asset_debt_history(
         raise HTTPException(status_code=404, detail="Asset not found")
     
     return history
-
 
 @router.post("/simulate", response_model=DebtSimulationResponse)
 def simulate_debt(
@@ -87,7 +83,6 @@ def simulate_debt(
     )
     
     return simulation
-
 
 @router.get("/ward/{ward_id}", response_model=WardDebtSummary)
 def get_ward_debt(
@@ -134,7 +129,6 @@ def get_ward_debt(
         highest_debt_asset_id=highest_debt_asset_id,
         highest_debt_amount=highest_debt,
     )
-
 
 @router.get("/city", response_model=CityDebtSummary)
 def get_city_debt(
