@@ -8,7 +8,6 @@ and links to issues and debt snapshots.
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Float, DateTime, Text, Enum as SQLEnum
 from sqlalchemy.orm import relationship
-from geoalchemy2 import Geometry
 import enum
 
 from app.core.database import Base
@@ -66,12 +65,7 @@ class Asset(Base):
         default=AssetStatus.ACTIVE
     )
     
-    # Geospatial location (PostGIS point)
-    location = Column(
-        Geometry(geometry_type='POINT', srid=4326),
-        nullable=True,
-        index=True
-    )
+    # Simple lat/lng for location (no PostGIS required)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     

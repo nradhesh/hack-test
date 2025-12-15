@@ -7,7 +7,6 @@ for MDI score calculations.
 
 from datetime import datetime, date
 from sqlalchemy import Column, Integer, String, Float, DateTime, Date, Text, Index
-from geoalchemy2 import Geometry
 
 from app.core.database import Base
 
@@ -29,13 +28,7 @@ class Ward(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     
-    # Geographic boundary (PostGIS polygon)
-    boundary = Column(
-        Geometry(geometry_type='POLYGON', srid=4326),
-        nullable=True
-    )
-    
-    # Center point for display
+    # Center point for display (simple lat/lng)
     center_latitude = Column(Float, nullable=True)
     center_longitude = Column(Float, nullable=True)
     
