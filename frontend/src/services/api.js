@@ -22,6 +22,13 @@ export const getIssue = (id) => api.get(`/issues/${id}`);
 export const createIssue = (data) => api.post('/issues', data);
 export const resolveIssue = (id, data) => api.patch(`/issues/${id}/resolve`, data);
 
+// Wards
+export const getWards = () => api.get('/wards');
+export const getWard = (id) => api.get(`/wards/${id}`);
+export const createWard = (data) => api.post('/wards', data);
+export const updateWard = (id, data) => api.put(`/wards/${id}`, data);
+export const deleteWard = (id) => api.delete(`/wards/${id}`);
+
 // Debt
 export const getAssetDebt = (id) => api.get(`/debt/asset/${id}`);
 export const getAssetDebtHistory = (id, days = 30) => api.get(`/debt/asset/${id}/history`, { params: { days } });

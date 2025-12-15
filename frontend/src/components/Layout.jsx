@@ -6,7 +6,8 @@ import {
     MapPin,
     Calculator,
     Activity,
-    TrendingDown
+    TrendingDown,
+    Settings
 } from 'lucide-react';
 
 const navItems = [
@@ -15,6 +16,7 @@ const navItems = [
     { path: '/assets', icon: Building2, label: 'Assets' },
     { path: '/wards', icon: MapPin, label: 'Wards' },
     { path: '/simulator', icon: Calculator, label: 'Simulator' },
+    { path: '/admin', icon: Settings, label: 'Admin' },
 ];
 
 export default function Layout({ children }) {
@@ -49,8 +51,8 @@ export default function Layout({ children }) {
                                     <Link
                                         to={item.path}
                                         className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
-                                                ? 'bg-primary-500/20 text-primary-400 shadow-lg shadow-primary-500/10'
-                                                : 'text-dark-400 hover:text-white hover:bg-white/5'
+                                            ? 'bg-primary-500/20 text-primary-400 shadow-lg shadow-primary-500/10'
+                                            : 'text-dark-400 hover:text-white hover:bg-white/5'
                                             }`}
                                     >
                                         <Icon className="w-5 h-5" />
