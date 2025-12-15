@@ -41,6 +41,7 @@ export default function Admin() {
         category: 'pothole',
         severity: 'medium',
         estimated_repair_cost: 10000,
+        days_ago: 0,
     });
 
     useEffect(() => {
@@ -116,14 +117,24 @@ export default function Admin() {
     const handleIssueSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+
+        // Calculate backdated report date if days_ago is set
+        let reportDate = null;
+        if (issueForm.days_ago > 0) {
+            const date = new Date();
+            date.setDate(date.getDate() - parseInt(issueForm.days_ago));
+            reportDate = date.toISOString();
+        }
+
         try {
             await createIssue({
                 ...issueForm,
                 asset_id: parseInt(issueForm.asset_id),
                 estimated_repair_cost: parseFloat(issueForm.estimated_repair_cost),
+                report_date: reportDate,
             });
             showMessage('Issue created successfully!');
-            setIssueForm({ asset_id: '', title: '', description: '', category: 'pothole', severity: 'medium', estimated_repair_cost: 10000 });
+            setIssueForm({ asset_id: '', title: '', description: '', category: 'pothole', severity: 'medium', estimated_repair_cost: 10000, days_ago: 0 });
         } catch (e) {
             showMessage(e.response?.data?.detail || 'Failed to create issue', 'error');
         } finally {
@@ -164,8 +175,8 @@ export default function Admin() {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-lg md:rounded-xl font-medium transition-all text-sm ${activeTab === tab.id
-                                ? 'bg-primary-500 text-white'
-                                : 'bg-dark-800 text-dark-400 hover:text-white hover:bg-dark-700'
+                            ? 'bg-primary-500 text-white'
+                            : 'bg-dark-800 text-dark-400 hover:text-white hover:bg-dark-700'
                             }`}
                     >
                         <tab.icon className="w-4 h-4 md:w-5 md:h-5" />
@@ -440,6 +451,17 @@ export default function Admin() {
                                 value={issueForm.estimated_repair_cost}
                                 onChange={(e) => setIssueForm({ ...issueForm, estimated_repair_cost: e.target.value })}
                                 className={inputClass}
+                            />
+                        </div>
+                        <div>
+                            <label className={labelClass}>Days Ago (Demo)</label>
+                            <input
+                                type="number"
+                                min="0"
+                                value={issueForm.days_ago}
+                                onChange={(e) => setIssueForm({ ...issueForm, days_ago: e.target.value })}
+                                className={inputClass}
+                                placeholder="0"
                             />
                         </div>
                         <div className="md:col-span-2">

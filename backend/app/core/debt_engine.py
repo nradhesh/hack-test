@@ -319,10 +319,25 @@ class MDIScoreCalculator:
         max_multiplier = settings.MAX_DEBT_MULTIPLIER
         
         if debt_ratio <= 0:
-            score = 100.0
+            # Even with no overdue debt, if there are base costs (open issues),
+            # the score shouldn't be perfect 100.
+            # We apply a small "existence penalty" for open issues.
+            if total_base_cost > 0:
+                # Treat 10% of base cost as "health impact" even if within SLA
+                effective_ratio = 0.1
+                log_ratio = math.log(1 + effective_ratio)
+                log_max = math.log(max_multiplier)
+                normalized = log_ratio / log_max
+                score = max(0, 100 * (1 - normalized))
+            else:
+                score = 100.0
         else:
+            # Add existence penalty to actual debt
+            # This ensures smooth transition from "Fresh Issue" (ratio 0.1) to "Overdue" (ratio > 0.1)
+            effective_ratio = debt_ratio + 0.1
+            
             # Normalize using log scale
-            log_debt = math.log(1 + debt_ratio)
+            log_debt = math.log(1 + effective_ratio)
             log_max = math.log(max_multiplier)
             normalized = log_debt / log_max
             score = max(0, 100 * (1 - normalized))

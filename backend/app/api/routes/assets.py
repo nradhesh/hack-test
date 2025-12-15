@@ -64,8 +64,13 @@ def list_assets(
     items = []
     debt_service = DebtService(db)
     
+    from app.services.aggregation_service import AggregationService
+    agg_service = AggregationService(db)
+    
     for asset in assets:
         debt_response = debt_service.get_asset_debt(asset.id)
+        score_response = agg_service.get_asset_mdi_score(asset.id)
+        
         items.append(AssetResponse(
             id=asset.id,
             asset_code=asset.asset_code,
@@ -86,6 +91,7 @@ def list_assets(
             updated_at=asset.updated_at,
             open_issue_count=debt_response.open_issues if debt_response else 0,
             current_debt=debt_response.total_debt if debt_response else 0.0,
+            mdi_score=score_response.mdi_score if score_response else 100.0,
         ))
     
     return AssetListResponse(
