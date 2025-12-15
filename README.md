@@ -2,11 +2,13 @@
 
 A comprehensive platform that treats urban infrastructure maintenance delays as accumulating financial debt, quantifies neglect using time-based compounding costs, and produces an **Urban Credit Score** for assets, wards, and cities.
 
-![MDI Dashboard](https://img.shields.io/badge/Status-Production%20Ready-green)
-![Python](https://img.shields.io/badge/Python-3.11+-blue)
-![React](https://img.shields.io/badge/React-18+-blue)
 
 ## 🎯 Core Concepts
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/cc8833e3-c016-42fa-8856-70fbf60bc2be" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a008e7d0-2061-4f8b-afb7-3ef0680cfeb9" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/42df5d66-3f99-4924-9ece-c4119907fec6" />
+
+
 
 ### Maintenance Debt
 Maintenance Debt is the **additional cost incurred due to delayed maintenance** beyond an expected repair timeline. Debt grows **non-linearly** with time delay using compound interest formulas:
