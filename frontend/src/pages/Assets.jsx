@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Search, ChevronRight, AlertTriangle, RefreshCw } from 'lucide-react';
 import { getAssets } from '../services/api';
 import { formatCurrency, getMDIColor, getAssetTypeIcon, formatDate } from '../utils/helpers';
 
@@ -9,15 +9,18 @@ export default function Assets() {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [total, setTotal] = useState(0);
     const [search, setSearch] = useState('');
     const [typeFilter, setTypeFilter] = useState('');
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         loadAssets();
-    }, [page, search, typeFilter]);
+    }, [page, typeFilter]);
 
     const loadAssets = async () => {
         setLoading(true);
+        setError(null);
         try {
             const response = await getAssets({
                 page,
@@ -25,13 +28,21 @@ export default function Assets() {
                 search: search || undefined,
                 asset_type: typeFilter || undefined,
             });
-            setAssets(response.data.items);
-            setTotalPages(response.data.total_pages);
+            setAssets(response.data.items || []);
+            setTotalPages(response.data.total_pages || 1);
+            setTotal(response.data.total || 0);
         } catch (error) {
             console.error('Error loading assets:', error);
+            setError('Failed to load assets. Please try again.');
+            setAssets([]);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleSearch = () => {
+        setPage(1);
+        loadAssets();
     };
 
     const assetTypes = ['road', 'drain', 'streetlight', 'bridge', 'sidewalk'];
@@ -42,8 +53,15 @@ export default function Assets() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-white">Assets</h1>
-                    <p className="text-dark-400 mt-1">Manage urban infrastructure assets</p>
+                    <p className="text-dark-400 mt-1">Manage urban infrastructure assets ({total} total)</p>
                 </div>
+                <button
+                    onClick={loadAssets}
+                    className="px-4 py-2 bg-primary-500/20 text-primary-400 rounded-lg hover:bg-primary-500/30 transition-colors flex items-center gap-2"
+                >
+                    <RefreshCw className="w-4 h-4" />
+                    Refresh
+                </button>
             </div>
 
             {/* Filters */}
@@ -54,7 +72,8 @@ export default function Assets() {
                         type="text"
                         placeholder="Search assets..."
                         value={search}
-                        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                         className="w-full pl-10 pr-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-white placeholder-dark-500 focus:outline-none focus:border-primary-500"
                     />
                 </div>
@@ -68,7 +87,20 @@ export default function Assets() {
                         <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
                     ))}
                 </select>
+                <button
+                    onClick={handleSearch}
+                    className="px-6 py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-colors"
+                >
+                    Search
+                </button>
             </div>
+
+            {/* Error Message */}
+            {error && (
+                <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-xl text-red-400">
+                    {error}
+                </div>
+            )}
 
             {/* Table */}
             <div className="glass-card rounded-2xl overflow-hidden">
@@ -80,7 +112,7 @@ export default function Assets() {
                             <th className="text-left text-dark-400 text-sm font-medium px-6 py-4">MDI Score</th>
                             <th className="text-left text-dark-400 text-sm font-medium px-6 py-4">Current Debt</th>
                             <th className="text-left text-dark-400 text-sm font-medium px-6 py-4">Issues</th>
-                            <th className="text-left text-dark-400 text-sm font-medium px-6 py-4">Last Maintenance</th>
+                            <th className="text-left text-dark-400 text-sm font-medium px-6 py-4">Location</th>
                             <th className="px-6 py-4"></th>
                         </tr>
                     </thead>
@@ -89,11 +121,14 @@ export default function Assets() {
                             <tr>
                                 <td colSpan={7} className="text-center py-12">
                                     <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500 mx-auto"></div>
+                                    <p className="text-dark-400 mt-2">Loading assets...</p>
                                 </td>
                             </tr>
                         ) : assets.length === 0 ? (
                             <tr>
-                                <td colSpan={7} className="text-center py-12 text-dark-400">No assets found</td>
+                                <td colSpan={7} className="text-center py-12 text-dark-400">
+                                    No assets found. Try adjusting your filters.
+                                </td>
                             </tr>
                         ) : (
                             assets.map((asset) => (
@@ -133,7 +168,7 @@ export default function Assets() {
                                         )}
                                     </td>
                                     <td className="px-6 py-4 text-dark-400">
-                                        {formatDate(asset.last_maintenance_date)}
+                                        {asset.zone || 'N/A'}
                                     </td>
                                     <td className="px-6 py-4">
                                         <Link
@@ -153,20 +188,20 @@ export default function Assets() {
                 {totalPages > 1 && (
                     <div className="flex items-center justify-between px-6 py-4 border-t border-white/5">
                         <p className="text-dark-400 text-sm">
-                            Page {page} of {totalPages}
+                            Page {page} of {totalPages} ({total} assets)
                         </p>
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setPage(p => Math.max(1, p - 1))}
                                 disabled={page === 1}
-                                className="px-4 py-2 bg-dark-700 text-white rounded-lg disabled:opacity-50"
+                                className="px-4 py-2 bg-dark-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-dark-600 transition-colors"
                             >
                                 Previous
                             </button>
                             <button
                                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                 disabled={page === totalPages}
-                                className="px-4 py-2 bg-dark-700 text-white rounded-lg disabled:opacity-50"
+                                className="px-4 py-2 bg-dark-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-dark-600 transition-colors"
                             >
                                 Next
                             </button>

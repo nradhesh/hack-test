@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { MapPin, TrendingUp, TrendingDown, ChevronRight } from 'lucide-react';
+import { TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
 import ScoreGauge from '../components/ScoreGauge';
 import { getAllWardScores, getCityScore } from '../services/api';
 import { formatCurrency, getMDIColor, getMDIBgColor } from '../utils/helpers';
@@ -9,6 +8,7 @@ export default function Wards() {
     const [wards, setWards] = useState([]);
     const [cityScore, setCityScore] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [sortBy, setSortBy] = useState('score');
 
     useEffect(() => {
@@ -16,15 +16,18 @@ export default function Wards() {
     }, [sortBy]);
 
     const loadData = async () => {
+        setLoading(true);
+        setError(null);
         try {
             const [wardsRes, cityRes] = await Promise.all([
                 getAllWardScores({ sort_by: sortBy, order: sortBy === 'name' ? 'asc' : 'desc' }),
                 getCityScore(),
             ]);
-            setWards(wardsRes.data);
+            setWards(wardsRes.data || []);
             setCityScore(cityRes.data);
         } catch (error) {
             console.error('Error loading wards:', error);
+            setError('Failed to load ward data. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -44,21 +47,37 @@ export default function Wards() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-white">Wards</h1>
-                    <p className="text-dark-400 mt-1">Administrative ward health overview</p>
+                    <p className="text-dark-400 mt-1">Administrative ward health overview ({wards.length} wards)</p>
                 </div>
-                <div className="flex items-center gap-2">
-                    <span className="text-dark-400 text-sm">Sort by:</span>
-                    <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="px-3 py-2 bg-dark-800 border border-dark-700 rounded-lg text-white text-sm"
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        <span className="text-dark-400 text-sm">Sort by:</span>
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className="px-3 py-2 bg-dark-800 border border-dark-700 rounded-lg text-white text-sm"
+                        >
+                            <option value="score">MDI Score</option>
+                            <option value="debt">Total Debt</option>
+                            <option value="name">Name</option>
+                        </select>
+                    </div>
+                    <button
+                        onClick={loadData}
+                        className="px-4 py-2 bg-primary-500/20 text-primary-400 rounded-lg hover:bg-primary-500/30 transition-colors flex items-center gap-2"
                     >
-                        <option value="score">MDI Score</option>
-                        <option value="debt">Total Debt</option>
-                        <option value="name">Name</option>
-                    </select>
+                        <RefreshCw className="w-4 h-4" />
+                        Refresh
+                    </button>
                 </div>
             </div>
+
+            {/* Error */}
+            {error && (
+                <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-xl text-red-400">
+                    {error}
+                </div>
+            )}
 
             {/* City Summary */}
             {cityScore && (
@@ -69,76 +88,80 @@ export default function Wards() {
                             <div className="grid grid-cols-4 gap-6 mt-4">
                                 <div>
                                     <p className="text-dark-500 text-sm">Total Wards</p>
-                                    <p className="text-2xl font-bold text-white">{cityScore.total_wards}</p>
+                                    <p className="text-2xl font-bold text-white">{cityScore.total_wards || wards.length}</p>
                                 </div>
                                 <div>
                                     <p className="text-dark-500 text-sm">Total Assets</p>
-                                    <p className="text-2xl font-bold text-white">{cityScore.total_assets}</p>
+                                    <p className="text-2xl font-bold text-white">{cityScore.total_assets || 0}</p>
                                 </div>
                                 <div>
                                     <p className="text-dark-500 text-sm">Total Debt</p>
-                                    <p className="text-2xl font-bold text-red-400">{formatCurrency(cityScore.total_debt)}</p>
+                                    <p className="text-2xl font-bold text-red-400">{formatCurrency(cityScore.total_debt || 0)}</p>
                                 </div>
                                 <div>
                                     <p className="text-dark-500 text-sm">Open Issues</p>
-                                    <p className="text-2xl font-bold text-yellow-400">{cityScore.total_open_issues}</p>
+                                    <p className="text-2xl font-bold text-yellow-400">{cityScore.total_open_issues || 0}</p>
                                 </div>
                             </div>
                         </div>
-                        <ScoreGauge score={cityScore.mdi_score} size="md" />
+                        <ScoreGauge score={cityScore.mdi_score || 75} size="md" />
                     </div>
                 </div>
             )}
 
             {/* Ward Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {wards.map((ward, idx) => (
-                    <div key={ward.ward_id} className="glass-card rounded-2xl p-5 hover:border-primary-500/30 transition-all">
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                                <div className={`w-10 h-10 rounded-xl ${getMDIBgColor(ward.mdi_score)} bg-opacity-20 flex items-center justify-center`}>
-                                    <span className={`font-bold ${getMDIColor(ward.mdi_score)}`}>#{ward.city_rank || idx + 1}</span>
+            {wards.length === 0 ? (
+                <div className="glass-card rounded-2xl p-12 text-center">
+                    <p className="text-dark-400">No wards found</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {wards.map((ward, idx) => (
+                        <div key={ward.ward_id || idx} className="glass-card rounded-2xl p-5 hover:border-primary-500/30 transition-all">
+                            <div className="flex items-start justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-xl ${getMDIBgColor(ward.mdi_score)} bg-opacity-20 flex items-center justify-center`}>
+                                        <span className={`font-bold ${getMDIColor(ward.mdi_score)}`}>#{ward.city_rank || idx + 1}</span>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-white font-semibold">{ward.ward_name}</h3>
+                                        <p className="text-dark-500 text-sm">{ward.zone || 'Zone'}</p>
+                                    </div>
                                 </div>
+                                <span className={`text-2xl font-bold ${getMDIColor(ward.mdi_score)}`}>
+                                    {ward.mdi_score?.toFixed(0) || '0'}
+                                </span>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-3 mb-4">
+                                <div className="p-2 rounded-lg bg-dark-800/50 text-center">
+                                    <p className="text-dark-500 text-xs">Assets</p>
+                                    <p className="text-white font-medium">{ward.total_assets || 0}</p>
+                                </div>
+                                <div className="p-2 rounded-lg bg-dark-800/50 text-center">
+                                    <p className="text-dark-500 text-xs">Issues</p>
+                                    <p className="text-yellow-400 font-medium">{ward.open_issues || 0}</p>
+                                </div>
+                                <div className="p-2 rounded-lg bg-dark-800/50 text-center">
+                                    <p className="text-dark-500 text-xs">Overdue</p>
+                                    <p className="text-red-400 font-medium">{ward.overdue_issues || 0}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-3 border-t border-white/5">
                                 <div>
-                                    <h3 className="text-white font-semibold">{ward.ward_name}</h3>
-                                    <p className="text-dark-500 text-sm">{ward.zone}</p>
+                                    <p className="text-dark-500 text-xs">Total Debt</p>
+                                    <p className="text-red-400 font-medium">{formatCurrency(ward.total_debt || 0)}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-dark-500 text-xs">Category</p>
+                                    <p className={`font-medium ${getMDIColor(ward.mdi_score)}`}>{ward.score_category || 'Good'}</p>
                                 </div>
                             </div>
-                            <span className={`text-2xl font-bold ${getMDIColor(ward.mdi_score)}`}>
-                                {ward.mdi_score.toFixed(0)}
-                            </span>
                         </div>
-
-                        <div className="grid grid-cols-3 gap-3 mb-4">
-                            <div className="p-2 rounded-lg bg-dark-800/50 text-center">
-                                <p className="text-dark-500 text-xs">Assets</p>
-                                <p className="text-white font-medium">{ward.total_assets}</p>
-                            </div>
-                            <div className="p-2 rounded-lg bg-dark-800/50 text-center">
-                                <p className="text-dark-500 text-xs">Issues</p>
-                                <p className="text-yellow-400 font-medium">{ward.open_issues}</p>
-                            </div>
-                            <div className="p-2 rounded-lg bg-dark-800/50 text-center">
-                                <p className="text-dark-500 text-xs">Overdue</p>
-                                <p className="text-red-400 font-medium">{ward.overdue_issues}</p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center justify-between pt-3 border-t border-white/5">
-                            <div>
-                                <p className="text-dark-500 text-xs">Total Debt</p>
-                                <p className="text-red-400 font-medium">{formatCurrency(ward.total_debt)}</p>
-                            </div>
-                            {ward.score_change_7d !== null && (
-                                <div className={`flex items-center gap-1 ${ward.score_change_7d >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                    {ward.score_change_7d >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                                    <span className="text-sm">{Math.abs(ward.score_change_7d).toFixed(1)}</span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

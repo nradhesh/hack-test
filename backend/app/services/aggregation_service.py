@@ -141,9 +141,10 @@ class AggregationService:
             return None
         
         # Get all assets in ward
+        from app.models.asset import AssetStatus
         assets = self.db.query(Asset).filter(
             Asset.ward_id == ward_id,
-            Asset.status == "active"
+            Asset.status == AssetStatus.ACTIVE
         ).all()
         
         if not assets:
