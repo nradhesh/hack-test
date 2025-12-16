@@ -8,7 +8,7 @@ This guide shows how to demonstrate the Maintenance Debt Index system working en
 
 ## Step 1: Show the Dashboard (30 seconds)
 
-**URL:** http://localhost:5173
+**URL:** http://localhost:5173 
 
 **Explain:**
 - "This is the city's infrastructure health at a glance"
@@ -18,6 +18,7 @@ This guide shows how to demonstrate the Maintenance Debt Index system working en
 
 **Key talking point:**
 > "Just like a credit score tells banks about your financial health, MDI tells city administrators about their infrastructure health."
+
 
 ---
 
