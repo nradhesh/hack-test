@@ -78,6 +78,9 @@ export default function AssetDetail() {
             {/* Score & Summary */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Score Card */}
+
+
+            
                 <div className="glass-card rounded-2xl p-6 flex flex-col items-center justify-center">
                     <ScoreGauge score={asset.mdi_score || 100} size="lg" />
                 </div>

@@ -10,7 +10,7 @@ import Admin from './pages/Admin';
 
 function App() {
     return (
-        <Router>
+        <Router> 
             <Layout>
                 <Routes>
                     <Route path="/" element={<Dashboard />} />
