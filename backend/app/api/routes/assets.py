@@ -53,6 +53,7 @@ def list_assets(
     # Get total count
     total = query.count()
     
+    
     # Apply pagination
     offset = (page - 1) * page_size
     assets = query.offset(offset).limit(page_size).all()
